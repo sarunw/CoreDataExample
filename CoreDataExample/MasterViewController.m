@@ -8,6 +8,7 @@
 
 #import "MasterViewController.h"
 #import "DetailViewController.h"
+#import "PersistentStack.h"
 
 @interface MasterViewController ()
 
@@ -26,6 +27,19 @@
 
     UIBarButtonItem *addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(insertNewObject:)];
     self.navigationItem.rightBarButtonItem = addButton;
+    
+    
+    UISwitch *iCloudSwitch = [[UISwitch alloc] init];
+    [iCloudSwitch addTarget:self action:@selector(switchChanged:) forControlEvents:UIControlEventValueChanged];
+    UIBarButtonItem *switchButton = [[UIBarButtonItem alloc] initWithCustomView:iCloudSwitch];
+    self.toolbarItems = @[switchButton];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(storeChange:) name:PSStoreChangeNotification object:nil];
+}
+
+- (void)storeChange:(NSNotification *)n
+{
+    [self.tableView reloadData];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -128,7 +142,7 @@
     
     // Edit the section name key path and cache name if appropriate.
     // nil for section name key path means "no sections".
-    NSFetchedResultsController *aFetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest managedObjectContext:self.managedObjectContext sectionNameKeyPath:nil cacheName:@"Master"];
+    NSFetchedResultsController *aFetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest managedObjectContext:self.managedObjectContext sectionNameKeyPath:nil cacheName:nil];
     aFetchedResultsController.delegate = self;
     self.fetchedResultsController = aFetchedResultsController;
     
@@ -205,5 +219,15 @@
     [self.tableView reloadData];
 }
  */
+
+#pragma mark - Actions
+
+- (void)switchChanged:(id)sender{
+    if([sender isOn]){
+        NSLog(@"Switch is ON");
+    } else{
+        NSLog(@"Switch is OFF");
+    }
+}
 
 @end
